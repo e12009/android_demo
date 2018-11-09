@@ -198,59 +198,117 @@ public class TaskActivity extends AppCompatActivity {
                 Log.e(TAG, "task succeeded, not carrier result field holds null");
             }
             else {
-                for (CallHistory callHistory : result.getCallHistory()) {
-                    int count = callHistory.getDetails() != null ? callHistory.getDetails().size() : 0;
+                if (null == result.getCallHistory()) {
                     CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
-                            callHistory.getMonth(),
+                            "六个月",
                             "通话记录",
-                            count
+                            0
                     );
 
                     itemList.add(dataItem);
                 }
+                else {
+                    for (CallHistory callHistory : result.getCallHistory()) {
+                        int count = callHistory.getDetails() != null ? callHistory.getDetails().size() : 0;
+                        CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                                callHistory.getMonth(),
+                                "通话记录",
+                                count
+                        );
 
-                for (SmsHistory smsHistory : result.getSmsHistory()) {
-                    int count = smsHistory.getDetails() != null ? smsHistory.getDetails().size() : 0;
+                        itemList.add(dataItem);
+                    }
+                }
+
+                if (null == result.getSmsHistory()) {
                     CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
-                            smsHistory.getMonth(),
+                            "六个月",
                             "短信记录",
-                            count
+                            0
                     );
 
                     itemList.add(dataItem);
+
+                }
+                else {
+                    for (SmsHistory smsHistory : result.getSmsHistory()) {
+                        int count = smsHistory.getDetails() != null ? smsHistory.getDetails().size() : 0;
+                        CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                                smsHistory.getMonth(),
+                                "短信记录",
+                                count
+                        );
+
+                        itemList.add(dataItem);
+                    }
                 }
 
-                for (BillHistory billHistory : result.getBillHistory()) {
-                    int count = billHistory.getDetails() != null ? billHistory.getDetails().size() : 0;
+                if (null == result.getBillHistory()) {
                     CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
-                            billHistory.getMonth(),
+                            "六个月",
                             "月账单",
-                            count
+                            0
                     );
 
                     itemList.add(dataItem);
+
+                }
+                else {
+                    for (BillHistory billHistory : result.getBillHistory()) {
+                        int count = billHistory.getDetails() != null ? billHistory.getDetails().size() : 0;
+                        CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                                billHistory.getMonth(),
+                                "月账单",
+                                count
+                        );
+
+                        itemList.add(dataItem);
+                    }
                 }
 
-                for (NetFlowHistory netFlowHistory : result.getNetFlowHistory()) {
-                    int count = netFlowHistory.getDetails() != null ? netFlowHistory.getDetails().size() : 0;
+                if (null == result.getNetFlowHistory()) {
                     CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
-                            netFlowHistory.getMonth(),
+                            "六个月",
                             "网络流量",
-                            count
+                            0
+                    );
+
+                    itemList.add(dataItem);
+
+                }
+                else {
+                    for (NetFlowHistory netFlowHistory : result.getNetFlowHistory()) {
+                        int count = netFlowHistory.getDetails() != null ? netFlowHistory.getDetails().size() : 0;
+                        CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                                netFlowHistory.getMonth(),
+                                "网络流量",
+                                count
+                        );
+
+                        itemList.add(dataItem);
+                    }
+                }
+
+                if (null == result.getWebsiteHistory()) {
+                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                            "六个月",
+                            "上网记录",
+                            0
                     );
 
                     itemList.add(dataItem);
                 }
+                else {
+                    for (WebsiteHistory websiteHistory : result.getWebsiteHistory()) {
+                        int count = websiteHistory.getDetails() != null ? websiteHistory.getDetails().size() : 0;
+                        CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                                websiteHistory.getMonth(),
+                                "上网记录",
+                                count
+                        );
 
-                for (WebsiteHistory websiteHistory : result.getWebsiteHistory()) {
-                    int count = websiteHistory.getDetails() != null ? websiteHistory.getDetails().size() : 0;
-                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
-                            websiteHistory.getMonth(),
-                            "上网记录",
-                            count
-                    );
-
-                    itemList.add(dataItem);
+                        itemList.add(dataItem);
+                    }
                 }
 
                 if (null == mCarrierAdapter) {

@@ -50,7 +50,7 @@ public class CarrierAdapter extends RecyclerView.Adapter {
 
         holder.typeTextView.setText(dataItem.getType());
         holder.monthTextView.setText(dataItem.getMonth());
-        holder.countTextView.setText(dataItem.getCount());
+        holder.countTextView.setText(String.valueOf(dataItem.getCount()));
     }
 
     @Override

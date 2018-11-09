@@ -3,8 +3,9 @@
         xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
         app:cardCornerRadius="2dp"
         app:cardElevation="5dp"
+        android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
     <LinearLayout
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/activity_horizontal_margin"
