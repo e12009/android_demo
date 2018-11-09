@@ -20,8 +20,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xinde.reponse.TaskCreationResponse;
 import com.xinde.reponse.TaskStatusResponse;
+import com.xinde.reponse.taskresult.CarrierResult;
 import com.xinde.resume.PasswordItem;
 import com.xinde.resume.SmsCodeItem;
 import com.xinde.resume.UserNameAndIDItem;
@@ -34,6 +36,7 @@ import okhttp3.*;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -66,7 +69,7 @@ public class TaskActivity extends AppCompatActivity {
     private View mFailureView = null;
     private View mSuccessView = null;
 
-    private TaskStatusResponse mCurrentTaskStatusResp = null;
+    private TaskStatusResponse<CarrierResult> mCurrentTaskStatusResp = null;
     private int mSuspendedType = SUSPENDED_TYPE_NULL;
 
     @Override
@@ -186,7 +189,7 @@ public class TaskActivity extends AppCompatActivity {
         return !cancel;
     }
 
-    private void showSuspendedUI(TaskStatusResponse response) {
+    private void showSuspendedUI(TaskStatusResponse<CarrierResult> response) {
         if (null == response) {
             Log.e(TAG, "response is not passed in, we cannot process the suspended case.");
             return;
@@ -286,7 +289,7 @@ public class TaskActivity extends AppCompatActivity {
                     break;
 
                 case MSG_CHECK_TASK_STATUS_FEEDBACK:
-                    mCurrentTaskStatusResp = (TaskStatusResponse) msg.obj;
+                    mCurrentTaskStatusResp = (TaskStatusResponse<CarrierResult>) msg.obj;
 
                     if (null == mCurrentTaskStatusResp) break;
 
@@ -318,7 +321,7 @@ public class TaskActivity extends AppCompatActivity {
 
                 case MSG_TASK_SUSPENDED:
                     // {"tid":"f08e7936a9b14f968053ed6f15c3fe89","type":"mobile","subType":"normal","status":"suspended","lastUpdateTime":"2018-11-09T02:52:00.827Z","need":"loginSMS","reason":"登录短信验证码已下发至手机13610503803, 请输入登录短信验证码"}
-                    mCurrentTaskStatusResp = (TaskStatusResponse) msg.obj;
+                    mCurrentTaskStatusResp = (TaskStatusResponse<CarrierResult>) msg.obj;
 
                     if (null == mCurrentTaskStatusResp) break;
                     else showSuspendedUI(mCurrentTaskStatusResp);
@@ -544,11 +547,10 @@ public class TaskActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) {
-                        String jsonBody = response.body().string();
-                        Log.i(TAG, "[-] succeeded - " + jsonBody);
 
-                        TaskStatusResponse result = new Gson().fromJson(jsonBody, TaskStatusResponse.class);
-                        Log.i(TAG, "[-] " + result.toString());
+                        Type targetClz = new TypeToken<TaskStatusResponse<CarrierResult>>(){}.getType();
+                        TaskStatusResponse<CarrierResult> result = new Gson().fromJson(response.body().charStream(), targetClz);
+                        Log.i(TAG, "[-] succeeded - " + result.toString());
 
                         Message msg = mHandler.obtainMessage(MSG_CHECK_TASK_STATUS_FEEDBACK);
                         msg.obj = result;

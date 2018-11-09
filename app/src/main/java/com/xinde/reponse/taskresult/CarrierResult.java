@@ -1,11 +1,13 @@
 package com.xinde.reponse.taskresult;
 
+import java.util.List;
+
 public class CarrierResult {
     private UserInfo userinfo;
-    private CallHistory callHistory;
-    private SmsHistory smsHistory;
-    private BillHistory billHistory;
-    private WebsiteHistory websiteHistory;
+    private List<CallHistory> callHistory;
+    private List<SmsHistory> smsHistory;
+    private List<BillHistory> billHistory;
+    private List<WebsiteHistory> websiteHistory;
 
     public CarrierResult() {
     }
@@ -18,35 +20,35 @@ public class CarrierResult {
         this.userinfo = userinfo;
     }
 
-    public CallHistory getCallHistory() {
+    public List<CallHistory> getCallHistory() {
         return callHistory;
     }
 
-    public void setCallHistory(CallHistory callHistory) {
+    public void setCallHistory(List<CallHistory> callHistory) {
         this.callHistory = callHistory;
     }
 
-    public SmsHistory getSmsHistory() {
+    public List<SmsHistory> getSmsHistory() {
         return smsHistory;
     }
 
-    public void setSmsHistory(SmsHistory smsHistory) {
+    public void setSmsHistory(List<SmsHistory> smsHistory) {
         this.smsHistory = smsHistory;
     }
 
-    public BillHistory getBillHistory() {
+    public List<BillHistory> getBillHistory() {
         return billHistory;
     }
 
-    public void setBillHistory(BillHistory billHistory) {
+    public void setBillHistory(List<BillHistory> billHistory) {
         this.billHistory = billHistory;
     }
 
-    public WebsiteHistory getWebsiteHistory() {
+    public List<WebsiteHistory> getWebsiteHistory() {
         return websiteHistory;
     }
 
-    public void setWebsiteHistory(WebsiteHistory websiteHistory) {
+    public void setWebsiteHistory(List<WebsiteHistory> websiteHistory) {
         this.websiteHistory = websiteHistory;
     }
 

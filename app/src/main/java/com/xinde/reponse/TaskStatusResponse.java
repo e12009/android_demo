@@ -2,7 +2,7 @@ package com.xinde.reponse;
 
 import java.util.Date;
 
-public class TaskStatusResponse {
+public class TaskStatusResponse<T> {
     private String tid = null;
     private String status = null;
     private String phase = null;
@@ -11,8 +11,7 @@ public class TaskStatusResponse {
     private int failCode = 0;
     private String reason = null;
 
-    //TODO:
-    // private Object result = null;
+    private T result = null;
 
     public TaskStatusResponse() {
 
@@ -74,6 +73,14 @@ public class TaskStatusResponse {
         this.reason = reason;
     }
 
+    public T getResult() {
+        return result;
+    }
+
+    public void setResult(T result) {
+        this.result = result;
+    }
+
     public boolean isLogin() {
         return isProcessing() && "login".equalsIgnoreCase(phase);
     }
@@ -108,6 +115,7 @@ public class TaskStatusResponse {
                 ", need='" + need + '\'' +
                 ", failCode=" + failCode +
                 ", reason='" + reason + '\'' +
+                ", result=" + result +
                 '}';
     }
 }
