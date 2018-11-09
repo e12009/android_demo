@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -120,6 +121,16 @@ public class TaskActivity extends AppCompatActivity {
         // just ignore result from AuthInfoActivity
     }
 
+    private boolean hideSoftKeyboard(View activeView) {
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (null != imm && null != activeView) {
+            imm.hideSoftInputFromWindow(activeView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            return true;
+        }
+
+        return false;
+    }
+
     private void hideViews(View... views) {
         for (View view : views) {
             if (null == view) continue;
@@ -183,6 +194,13 @@ public class TaskActivity extends AppCompatActivity {
         } else {
             hideViews(mFailureView, mSuccessView, mSuspendedView);
             showView(mProcessView);
+
+            if (input1.isFocused()) {
+                hideSoftKeyboard(input1);
+            } else {
+                hideSoftKeyboard(input2);
+            }
+
             mTransport.resumeTask(mSuspendedType, primaryInput, secondaryInput);
         }
 
@@ -226,6 +244,10 @@ public class TaskActivity extends AppCompatActivity {
                 attemptResumeTask(input1, input2);
             }
         });
+
+        // clear previous content if present
+        input1.setText(null);
+        input2.setText(null);
 
         hideViews(input2);
         textView.setText(response.getReason());
@@ -320,7 +342,6 @@ public class TaskActivity extends AppCompatActivity {
                     break;
 
                 case MSG_TASK_SUSPENDED:
-                    // {"tid":"f08e7936a9b14f968053ed6f15c3fe89","type":"mobile","subType":"normal","status":"suspended","lastUpdateTime":"2018-11-09T02:52:00.827Z","need":"loginSMS","reason":"登录短信验证码已下发至手机13610503803, 请输入登录短信验证码"}
                     mCurrentTaskStatusResp = (TaskStatusResponse<CarrierResult>) msg.obj;
 
                     if (null == mCurrentTaskStatusResp) break;
