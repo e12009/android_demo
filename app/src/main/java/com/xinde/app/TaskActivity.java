@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,9 +24,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.xinde.adapter.CarrierAdapter;
 import com.xinde.reponse.TaskCreationResponse;
 import com.xinde.reponse.TaskStatusResponse;
-import com.xinde.reponse.taskresult.CarrierResult;
+import com.xinde.reponse.taskresult.*;
 import com.xinde.resume.PasswordItem;
 import com.xinde.resume.SmsCodeItem;
 import com.xinde.resume.UserNameAndIDItem;
@@ -42,8 +45,10 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -68,7 +73,9 @@ public class TaskActivity extends AppCompatActivity {
     private View mProcessView = null;
     private View mSuspendedView = null;
     private View mFailureView = null;
-    private View mSuccessView = null;
+    private RecyclerView mSuccessView = null;
+    private CarrierAdapter mCarrierAdapter = null;
+
 
     private TaskStatusResponse<CarrierResult> mCurrentTaskStatusResp = null;
     private int mSuspendedType = SUSPENDED_TYPE_NULL;
@@ -82,9 +89,13 @@ public class TaskActivity extends AppCompatActivity {
         mProcessView = findViewById(R.id.progress_view);
         mSuspendedView = findViewById(R.id.suspended_view);
         mFailureView = findViewById(R.id.suspended_view);
+        mSuccessView = (RecyclerView) findViewById(R.id.show_result_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);
+        mSuccessView.setLayoutManager(layoutManager);
 
         mTransport = new Transport();
 
@@ -167,6 +178,91 @@ public class TaskActivity extends AppCompatActivity {
         TextView textView = (TextView) mProcessView.findViewById(R.id.progress_message);
         textView.setText(msg);
         showView(mProcessView);
+
+    }
+
+    private void showTaskResult() {
+        hideViews(mFailureView, mSuspendedView, mProcessView);
+        showView(mSuccessView);
+
+        if (null == mCurrentTaskStatusResp) {
+            Log.e(TAG, "task succeeded, but we do not find out result data.");
+        }
+        else {
+            Log.i(TAG, "task succeeded, start to compose the UI data");
+
+            List<CarrierAdapter.DataItem> itemList = new ArrayList<>();
+
+            CarrierResult result = (CarrierResult) mCurrentTaskStatusResp.getResult();
+            if (null == result) {
+                Log.e(TAG, "task succeeded, not carrier result field holds null");
+            }
+            else {
+                for (CallHistory callHistory : result.getCallHistory()) {
+                    int count = callHistory.getDetails() != null ? callHistory.getDetails().size() : 0;
+                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                            callHistory.getMonth(),
+                            "通话记录",
+                            count
+                    );
+
+                    itemList.add(dataItem);
+                }
+
+                for (SmsHistory smsHistory : result.getSmsHistory()) {
+                    int count = smsHistory.getDetails() != null ? smsHistory.getDetails().size() : 0;
+                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                            smsHistory.getMonth(),
+                            "短信记录",
+                            count
+                    );
+
+                    itemList.add(dataItem);
+                }
+
+                for (BillHistory billHistory : result.getBillHistory()) {
+                    int count = billHistory.getDetails() != null ? billHistory.getDetails().size() : 0;
+                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                            billHistory.getMonth(),
+                            "月账单",
+                            count
+                    );
+
+                    itemList.add(dataItem);
+                }
+
+                for (NetFlowHistory netFlowHistory : result.getNetFlowHistory()) {
+                    int count = netFlowHistory.getDetails() != null ? netFlowHistory.getDetails().size() : 0;
+                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                            netFlowHistory.getMonth(),
+                            "网络流量",
+                            count
+                    );
+
+                    itemList.add(dataItem);
+                }
+
+                for (WebsiteHistory websiteHistory : result.getWebsiteHistory()) {
+                    int count = websiteHistory.getDetails() != null ? websiteHistory.getDetails().size() : 0;
+                    CarrierAdapter.DataItem dataItem = new CarrierAdapter.DataItem(
+                            websiteHistory.getMonth(),
+                            "上网记录",
+                            count
+                    );
+
+                    itemList.add(dataItem);
+                }
+
+                if (null == mCarrierAdapter) {
+                    mCarrierAdapter = new CarrierAdapter(mContext, itemList);
+                    mSuccessView.setAdapter(mCarrierAdapter);
+                } else {
+                    mCarrierAdapter.setDataItems(itemList);
+                    mCarrierAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+
 
     }
 
@@ -336,7 +432,7 @@ public class TaskActivity extends AppCompatActivity {
                     }
                     else if (mCurrentTaskStatusResp.isDone()) {
                         String hintMessage = "task done";
-                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_ABORT, hintMessage));
+                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_DONE, mCurrentTaskStatusResp));
                     }
 
                     break;
@@ -356,8 +452,10 @@ public class TaskActivity extends AppCompatActivity {
                     break;
 
                 case MSG_TASK_DONE:
-                    Log.i(TAG, "task succeeded, and we get the final result, just show it now.");
+                    mCurrentTaskStatusResp = (TaskStatusResponse<CarrierResult>) msg.obj;
 
+                    Log.i(TAG, "task succeeded, and we get the final result, just show it now.");
+                    showTaskResult();
                     break;
 
             }

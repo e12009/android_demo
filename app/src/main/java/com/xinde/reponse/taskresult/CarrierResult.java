@@ -7,6 +7,7 @@ public class CarrierResult {
     private List<CallHistory> callHistory;
     private List<SmsHistory> smsHistory;
     private List<BillHistory> billHistory;
+    private List<NetFlowHistory> netFlowHistory;
     private List<WebsiteHistory> websiteHistory;
 
     public CarrierResult() {
@@ -42,6 +43,14 @@ public class CarrierResult {
 
     public void setBillHistory(List<BillHistory> billHistory) {
         this.billHistory = billHistory;
+    }
+
+    public List<NetFlowHistory> getNetFlowHistory() {
+        return netFlowHistory;
+    }
+
+    public void setNetFlowHistory(List<NetFlowHistory> netFlowHistory) {
+        this.netFlowHistory = netFlowHistory;
     }
 
     public List<WebsiteHistory> getWebsiteHistory() {
