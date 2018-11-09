@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">信德数聚</string>
+    <string name="action_save">Save</string>
+    <string name="action_go">Go</string>
+    <string name="auth_appid">App ID</string>
+    <string name="auth_appsecret">App Secret</string>
+    <string name="auth_hint_appid">appId</string>
+    <string name="auth_hint_appsecret">appSecret</string>
+    <string name="carrier_user_name">userName</string>
+    <string name="carrier_phone_no">phoneNo</string>
+    <string name="carrier_password">password</string>
+    <string name="carrier_user_id">userID</string>
+    <string name="carrier_callback">callback (optional)</string>
+    <string name="short_user_name">userName</string>
+    <string name="short_phone_no">phoneNo</string>
+    <string name="short_password">password</string>
+    <string name="short_user_id">userID</string>
+    <string name="short_callback">callback</string>
+    <string name="error_invalid_appid">invalid appid</string>
+    <string name="error_invalid_appsecret">invalid appsecret</string>menu
+    <string name="error_invalid_username">invalid userName</string>
+    <string name="error_invalid_password">invalid password</string>
+    <string name="error_invalid_phoneno">invalid phoneNo</string>
+    <string name="error_invalid_userid">invalid userID</string>
+    <string name="error_invalid_callback">invalid callback</string>
+    <string name="xinde_carrier_demo">运营商业务演示</string>
+    <string name="title_activity_task">TaskActivity</string>
+    <string name="action_reset_auth">Reset Auth Info</string>
+    <string name="progress_status_login">登录中...</string>
+    <string name="progress_status_fetching">数据获取中...</string>
+</resources>
