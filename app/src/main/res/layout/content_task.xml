@@ -54,10 +54,27 @@
                 android:layout_height="wrap_content">
 
             <EditText
-                    android:id="@+id/suspended_input"
+                    android:id="@+id/suspended_input1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeActionId="1"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
+
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <EditText
+                    android:id="@+id/suspended_input2"
+                    android:visibility="gone"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeActionId="2"
                     android:imeOptions="actionUnspecified"
                     android:inputType="text"
                     android:maxLines="1"

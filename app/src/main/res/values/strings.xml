@@ -23,9 +23,11 @@
     <string name="error_invalid_phoneno">invalid phoneNo</string>
     <string name="error_invalid_userid">invalid userID</string>
     <string name="error_invalid_callback">invalid callback</string>
+    <string name="error_no_input">no data input</string>
     <string name="xinde_carrier_demo">运营商业务演示</string>
     <string name="title_activity_task">TaskActivity</string>
     <string name="action_reset_auth">Reset Auth Info</string>
     <string name="progress_status_login">登录中...</string>
     <string name="progress_status_fetching">数据获取中...</string>
+    <string name="hint_input_sms_code">输入短信验证码</string>
 </resources>

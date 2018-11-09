@@ -8,15 +8,23 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import com.xinde.reponse.TaskCreationResponse;
 import com.xinde.reponse.TaskStatusResponse;
+import com.xinde.resume.PasswordItem;
+import com.xinde.resume.SmsCodeItem;
+import com.xinde.resume.UserNameAndIDItem;
 import com.xinde.storage.Storage;
 import com.xinde.storage.item.AuthInfo;
 import com.xinde.storage.item.CarrierInfo;
@@ -39,12 +47,16 @@ public class TaskActivity extends AppCompatActivity {
     private static final String TAG = "TaskActivity";
 
     private static final int MSG_CREATE_TASK = 0x01;
-    private static final int MSG_CREATE_TASK_FEEDBACK = 0x11;
     private static final int MSG_CHECK_TASK_STATUS = 0x02;
     private static final int MSG_CHECK_TASK_STATUS_FEEDBACK = 0x22;
     private static final int MSG_TASK_SUSPENDED = 0x03;
-    private static final int MSG_TASK_SUSPENDED_FEEDBACK = 0x33;
     private static final int MSG_TASK_ABORT = 0x44;
+    private static final int MSG_TASK_DONE = 0x05;
+
+    private static final int SUSPENDED_TYPE_NULL = 0x00;
+    private static final int SUSPENDED_TYPE_NEED_PASSWORD = 0x01;
+    private static final int SUSPENDED_TYPE_NEED_SMSCODE = 0x02;
+    private static final int SUSPENDED_TYPE_NEED_AUTHINFO = 0x03;
 
     private Context mContext = null;
     private Transport mTransport = null;
@@ -53,6 +65,9 @@ public class TaskActivity extends AppCompatActivity {
     private View mSuspendedView = null;
     private View mFailureView = null;
     private View mSuccessView = null;
+
+    private TaskStatusResponse mCurrentTaskStatusResp = null;
+    private int mSuspendedType = SUSPENDED_TYPE_NULL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +156,117 @@ public class TaskActivity extends AppCompatActivity {
 
     }
 
+    private boolean attemptResumeTask(EditText input1, EditText input2) {
+
+        boolean cancel = false;
+        View focusView = null;
+
+        String primaryInput = input1.getText().toString();
+        String secondaryInput = input2.getText().toString();
+
+        if (TextUtils.isEmpty(primaryInput)) {
+            cancel = true;
+            focusView = input1;
+            input1.setError(getString(R.string.error_no_input));
+        }
+        else if (SUSPENDED_TYPE_NEED_AUTHINFO == mSuspendedType) {
+            cancel = true;
+            focusView = input2;
+            input2.setError(getString(R.string.error_no_input));
+        }
+
+        if (cancel) {
+            focusView.requestFocus();
+        } else {
+            hideViews(mFailureView, mSuccessView, mSuspendedView);
+            showView(mProcessView);
+            mTransport.resumeTask(mSuspendedType, primaryInput, secondaryInput);
+        }
+
+        return !cancel;
+    }
+
+    private void showSuspendedUI(TaskStatusResponse response) {
+        if (null == response) {
+            Log.e(TAG, "response is not passed in, we cannot process the suspended case.");
+            return;
+        }
+
+        hideViews(mProcessView, mFailureView, mSuccessView);
+
+        final EditText input1 = (EditText) mSuspendedView.findViewById(R.id.suspended_input1);
+        final EditText input2 = (EditText) mSuspendedView.findViewById(R.id.suspended_input2);
+        TextView textView = (TextView) mSuspendedView.findViewById(R.id.suspended_message);
+        mSuspendedType = SUSPENDED_TYPE_NULL;
+
+        TextView.OnEditorActionListener onEditorActionListener = new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+                    attemptResumeTask(input1, input2);
+                    return true;
+                }
+
+                return false;
+            }
+        };
+
+        Button button = (Button) mSuspendedView.findViewById(R.id.action_go);
+        button.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Called when a view has been clicked.
+             *
+             * @param v The view that was clicked.
+             */
+            @Override
+            public void onClick(View v) {
+                attemptResumeTask(input1, input2);
+            }
+        });
+
+        hideViews(input2);
+        textView.setText(response.getReason());
+
+        switch (response.getNeed()) {
+            case "SMS":
+            case "SMSJilinTelecom":
+            case "SMSAgain":
+            case "newSMS":
+            case "loginSMS":
+            case "loginSMSAgain":
+            case "newLoginSMS":
+                input1.setHint(R.string.hint_input_sms_code);
+                mSuspendedType = SUSPENDED_TYPE_NEED_SMSCODE;
+                break;
+
+            case "password":
+            case "passwordInOne":
+            case "passwordInTwo":
+            case "passwordInThree":
+            case "passwordInFour":
+            case "passwordInFive":
+            case "passwordTooSimple":
+                input1.setHint(R.string.short_password);
+                mSuspendedType = SUSPENDED_TYPE_NEED_PASSWORD;
+                break;
+
+            case "nameAndID":
+                showView(input2);
+                input1.setHint(R.string.carrier_user_name);
+                input2.setHint(R.string.carrier_user_id);
+                mSuspendedType = SUSPENDED_TYPE_NEED_AUTHINFO;
+                break;
+
+            default:
+                Log.e(TAG, "unsupported need type - " + response.getNeed());
+                //TODO: add more error handling logic
+                break;
+
+        }
+
+        showView(mSuspendedView);
+    }
+
     private Handler mHandler = new Handler() {
         /**
          * Subclasses must implement this to receive messages.
@@ -160,43 +286,55 @@ public class TaskActivity extends AppCompatActivity {
                     break;
 
                 case MSG_CHECK_TASK_STATUS_FEEDBACK:
-                    TaskStatusResponse response = (TaskStatusResponse) msg.obj;
+                    mCurrentTaskStatusResp = (TaskStatusResponse) msg.obj;
 
-                    if (null == response) break;
+                    if (null == mCurrentTaskStatusResp) break;
 
-                    if (response.isProcessing()) {
-                        if (response.isLogin()) {
+                    if (mCurrentTaskStatusResp.isProcessing()) {
+                        if (mCurrentTaskStatusResp.isLogin()) {
                             showOngoingMessage(getString(R.string.progress_status_login));
-                        } else if (response.isFetching()) {
+                        } else if (mCurrentTaskStatusResp.isFetching()) {
                             showOngoingMessage(getString(R.string.progress_status_fetching));
                         }
 
                         mHandler.sendEmptyMessageDelayed(MSG_CHECK_TASK_STATUS, 5000L);
                     }
-                    else if (response.isFailed()) {
-                        String errorInfo = "task " + response.getStatus() + ", "
-                                + "reason:" + response.getReason() + ", "
-                                + "failedCode:" + response.getFailCode();
+                    else if (mCurrentTaskStatusResp.isFailed()) {
+                        String errorInfo = "task " + mCurrentTaskStatusResp.getStatus() + ", "
+                                + "reason:" + mCurrentTaskStatusResp.getReason() + ", "
+                                + "failedCode:" + mCurrentTaskStatusResp.getFailCode();
 
                         mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_ABORT, errorInfo));
                     }
-                    else if (response.isSuspended()) {
-                        String hintMessage = "task suspended";
-                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_SUSPENDED, hintMessage));
+                    else if (mCurrentTaskStatusResp.isSuspended()) {
+                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_SUSPENDED, mCurrentTaskStatusResp));
                     }
-                    else if (response.isDone()) {
+                    else if (mCurrentTaskStatusResp.isDone()) {
                         String hintMessage = "task done";
-                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_SUSPENDED, hintMessage));
+                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_ABORT, hintMessage));
                     }
+
+                    break;
+
+                case MSG_TASK_SUSPENDED:
+                    // {"tid":"f08e7936a9b14f968053ed6f15c3fe89","type":"mobile","subType":"normal","status":"suspended","lastUpdateTime":"2018-11-09T02:52:00.827Z","need":"loginSMS","reason":"登录短信验证码已下发至手机13610503803, 请输入登录短信验证码"}
+                    mCurrentTaskStatusResp = (TaskStatusResponse) msg.obj;
+
+                    if (null == mCurrentTaskStatusResp) break;
+                    else showSuspendedUI(mCurrentTaskStatusResp);
 
                     break;
 
                 case MSG_TASK_ABORT:
+                    Log.i(TAG, "task terminated, please check out the reason in detail");
                     String abortMsg = (String) msg.obj;
                     showAbortMessage(abortMsg);
                     break;
 
+                case MSG_TASK_DONE:
+                    Log.i(TAG, "task succeeded, and we get the final result, just show it now.");
 
+                    break;
 
             }
             super.handleMessage(msg);
@@ -316,14 +454,40 @@ public class TaskActivity extends AppCompatActivity {
             }
         }
 
+        private final Callback genericCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "[-] failure - " + e.getMessage());
+                Message abortMsg = mHandler.obtainMessage(MSG_TASK_ABORT, e.getMessage());
+                mHandler.sendMessage(abortMsg);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    TaskCreationResponse result = new Gson().fromJson(response.body().charStream(), TaskCreationResponse.class);
+                    tid = result.getTid();
+
+                    Log.i(TAG, "[-] succeeded - " + result.toString());
+
+                    mHandler.sendEmptyMessage(MSG_CHECK_TASK_STATUS);
+                } else {
+                    String errorMsg = response.body().string();
+                    Log.e(TAG, "[-] failure - " + errorMsg);
+                    Message abortMsg = mHandler.obtainMessage(MSG_TASK_ABORT, errorMsg);
+                    mHandler.sendMessage(abortMsg);
+                }
+            }
+        };
 
         public void createTask() {
             AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
             CarrierInfo carrierInfo = Storage.getInstance().getCarrierInfo(mContext);
 
-            Log.i(TAG, "[x] create Task");
             Log.i(TAG, authInfo.toString());
             Log.i(TAG, carrierInfo.toString());
+            Log.i(TAG, "[x] create Task");
+
 
             String timestamp = String.valueOf(System.currentTimeMillis()/1000);
             String signature = new XindeSignatureBuilder(authInfo.getAppSecret())
@@ -342,45 +506,7 @@ public class TaskActivity extends AppCompatActivity {
                     .post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), jsonBody))
                     .build();
 
-
-            {
-                //FIXME:
-                Log.i(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                Log.i(TAG, "url:" + httpBuilder.build());
-                Log.i(TAG, "jsonBody:" + jsonBody);
-                Log.i(TAG, "body:" + RequestBody.create(MediaType.parse("application/json;charset=utf-8"), jsonBody).toString());
-            }
-
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e(TAG, "[-] failure - " + e.getMessage());
-                    Message abortMsg = mHandler.obtainMessage(MSG_TASK_ABORT, e.getMessage());
-                    mHandler.sendMessage(abortMsg);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        String jsonBody = response.body().string();
-                        Log.i(TAG, "[-] succeeded - " + jsonBody);
-
-                        TaskCreationResponse result = new Gson().fromJson(jsonBody, TaskCreationResponse.class);
-                        tid = result.getTid();
-
-                        Log.i(TAG, "[-] " + result.toString());
-
-                        mHandler.sendEmptyMessage(MSG_CHECK_TASK_STATUS);
-                    } else {
-                        String errorMsg = response.body().string();
-                        Log.e(TAG, errorMsg);
-                        Message abortMsg = mHandler.obtainMessage(MSG_TASK_ABORT, errorMsg);
-                        mHandler.sendMessage(abortMsg);
-                    }
-                }
-            });
-
-
+            client.newCall(request).enqueue(genericCallback);
 
         }
 
@@ -388,7 +514,6 @@ public class TaskActivity extends AppCompatActivity {
             AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
 
             Log.i(TAG, "[x] Check Task Status");
-            Log.i(TAG, authInfo.toString());
 
             String timestamp = String.valueOf(System.currentTimeMillis()/1000);
             String signature = new XindeSignatureBuilder(authInfo.getAppSecret())
@@ -431,12 +556,63 @@ public class TaskActivity extends AppCompatActivity {
                         mHandler.sendMessage(msg);
                     } else {
                         String errorMsg = response.body().string();
-                        Log.e(TAG, errorMsg);
+                        Log.e(TAG, "[-] failure - " + errorMsg);
                         Message abortMsg = mHandler.obtainMessage(MSG_TASK_ABORT, errorMsg);
                         mHandler.sendMessage(abortMsg);
                     }
                 }
             });
         }
+
+        public void resumeTask(int suspendedType, String primaryInput, String secondaryInput) {
+            AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
+
+            Log.i(TAG, authInfo.toString());
+            Log.i(TAG, "[x] resume Task");
+
+
+            String timestamp = String.valueOf(System.currentTimeMillis()/1000);
+            String signature = new XindeSignatureBuilder(authInfo.getAppSecret())
+                    .addParamStringPair("appid", authInfo.getAppId())
+                    .addParamStringPair("time", timestamp)
+                    .build();
+
+            String jsonBody = null;
+            switch (suspendedType) {
+                case SUSPENDED_TYPE_NEED_SMSCODE:
+                    jsonBody = new Gson().toJson(new SmsCodeItem(tid, primaryInput));
+                    break;
+
+                case SUSPENDED_TYPE_NEED_PASSWORD:
+                    jsonBody = new Gson().toJson(new PasswordItem(tid, primaryInput));
+                    break;
+
+                case SUSPENDED_TYPE_NEED_AUTHINFO:
+                    jsonBody = new Gson().toJson(new UserNameAndIDItem(tid, primaryInput, secondaryInput));
+                    break;
+
+                default:
+                    Log.e(TAG, "unsupported suspended type - " + suspendedType);
+                    //TODO: add more error handling logic
+                    return;
+
+            }
+
+            Log.i(TAG, "[x] resume task with data - " + jsonBody);
+
+            HttpUrl.Builder httpBuilder = HttpUrl.parse(XINDE_API_URL).newBuilder()
+                    .addQueryParameter("appid", authInfo.getAppId())
+                    .addQueryParameter("time", timestamp)
+                    .addQueryParameter("signature", signature);
+
+            Request request = new Request.Builder()
+                    .url(httpBuilder.build())
+                    .post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), jsonBody))
+                    .build();
+
+            client.newCall(request).enqueue(genericCallback);
+
+        }
+
     }
 }
