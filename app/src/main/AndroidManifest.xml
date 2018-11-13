@@ -19,12 +19,12 @@
             <!--</intent-filter>-->
         </activity>
         <activity
-                android:name=".MainActivity"
+                android:name=".CarrierMainActivity"
                 android:launchMode="singleTask"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-                android:name=".TaskActivity"
+                android:name=".CarrierTaskActivity"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity

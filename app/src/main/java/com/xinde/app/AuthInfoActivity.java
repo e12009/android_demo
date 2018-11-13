@@ -1,7 +1,7 @@
 package com.xinde.app;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -12,7 +12,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import com.xinde.common.Common;
 import com.xinde.storage.Storage;
 import com.xinde.storage.item.AuthInfo;
 
@@ -22,7 +21,6 @@ public class AuthInfoActivity extends AppCompatActivity {
     private Context mContext = null;
     private EditText mAppIdView = null;
     private EditText mAppSecretView = null;
-    private boolean isCallee = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +28,6 @@ public class AuthInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth_info);
 
         mContext = this;
-
-        isCallee = getIntent().getBooleanExtra(Common.KEY_RESET_AUTH_INFO, false);
 
         mAppIdView = (EditText) findViewById(R.id.appid);
         mAppIdView.setOnEditorActionListener(onEditorActionListener);
@@ -48,6 +44,13 @@ public class AuthInfoActivity extends AppCompatActivity {
         });
 
         populateAuthInfoIfNeeded();
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_CANCELED);
+
+        super.onBackPressed();
     }
 
     private void populateAuthInfoIfNeeded() {
@@ -86,13 +89,7 @@ public class AuthInfoActivity extends AppCompatActivity {
            Log.i(TAG, "start to save auth info - " + authInfo);
            Storage.getInstance().saveAuthInfo(mContext, authInfo);
 
-           if (!isCallee) {
-               Intent intent = new Intent(AuthInfoActivity.this, MainActivity.class);
-               mContext.startActivity(intent);
-           } else {
-               setResult(1, null);
-           }
-
+           setResult(Activity.RESULT_OK, null);
            finish();
        }
     }

@@ -1,5 +1,6 @@
 package com.xinde.app;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,11 +18,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.xinde.storage.Storage;
+import com.xinde.storage.item.AuthInfo;
 import com.xinde.storage.item.CarrierInfo;
 import com.xinde.util.Validator;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
+public class CarrierMainActivity extends AppCompatActivity {
+    private static final String TAG = "CarrierMainActivity";
+
+    private static final int MY_REQ_CONFIG_CODE = 0x100;
+    private static final int MY_REQ_RESET_CODE = 0x111;
 
     private Context mContext = null;
     private EditText mUserNameView = null;
@@ -44,6 +49,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
+        if (null == authInfo || null == authInfo.getAppId()) {
+            Intent intent = new Intent(CarrierMainActivity.this, AuthInfoActivity.class);
+            startActivityForResult(intent, MY_REQ_CONFIG_CODE);
+        }
     }
 
     private void buildWidgets() {
@@ -92,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset_auth) {
-            Intent intent = new Intent(MainActivity.this, AuthInfoActivity.class);
-            startActivityForResult(intent, 100);
+            Intent intent = new Intent(CarrierMainActivity.this, AuthInfoActivity.class);
+            startActivityForResult(intent, MY_REQ_RESET_CODE);
             return true;
         }
 
@@ -102,8 +118,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (MY_REQ_CONFIG_CODE != requestCode) return;
+
+        if (Activity.RESULT_CANCELED == resultCode) {
+            finish();
+            return;
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
-        // just ignore result from AuthInfoActivity
     }
 
     private void populateCarrierInfoIfNeeded() {
@@ -173,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, "start to save carrier info - " + carrierInfo);
             Storage.getInstance().saveCarrierInfo(mContext, carrierInfo);
 
-            Intent intent = new Intent(MainActivity.this, TaskActivity.class);
+            Intent intent = new Intent(CarrierMainActivity.this, CarrierTaskActivity.class);
             mContext.startActivity(intent);
 
         }

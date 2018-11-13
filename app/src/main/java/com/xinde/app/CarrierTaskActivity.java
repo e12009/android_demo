@@ -52,8 +52,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class TaskActivity extends AppCompatActivity {
-    private static final String TAG = "TaskActivity";
+public class CarrierTaskActivity extends AppCompatActivity {
+    private static final String TAG = "CarrierTaskActivity";
+
+    private static final int MY_REQ_CODE = 0x200;
 
     private static final int MSG_CREATE_TASK = 0x01;
     private static final int MSG_CHECK_TASK_STATUS = 0x02;
@@ -118,8 +120,8 @@ public class TaskActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset_auth) {
-            Intent intent = new Intent(TaskActivity.this, AuthInfoActivity.class);
-            startActivityForResult(intent, 200);
+            Intent intent = new Intent(CarrierTaskActivity.this, AuthInfoActivity.class);
+            startActivityForResult(intent, MY_REQ_CODE);
             return true;
         }
 
@@ -128,6 +130,8 @@ public class TaskActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (MY_REQ_CODE != requestCode) return;
+
         super.onActivityResult(requestCode, resultCode, data);
         // just ignore result from AuthInfoActivity
     }
