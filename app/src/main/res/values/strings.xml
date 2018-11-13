@@ -30,4 +30,6 @@
     <string name="progress_status_login">登录中...</string>
     <string name="progress_status_fetching">数据获取中...</string>
     <string name="hint_input_sms_code">输入短信验证码</string>
+    <string name="title_activity_action_list">ActionListActivity</string>
+    <string name="xinde_zhimafen_api_demo">芝麻分API直连业务演示</string>
 </resources>
