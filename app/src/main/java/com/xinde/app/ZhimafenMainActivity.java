@@ -22,15 +22,14 @@ import com.xinde.storage.item.AuthInfo;
 import com.xinde.storage.item.CarrierInfo;
 import com.xinde.util.FormatValidator;
 
-public class CarrierMainActivity extends AppCompatActivity {
-    private static final String TAG = "CarrierMainActivity";
+public class ZhimafenMainActivity extends AppCompatActivity {
+    private static final String TAG = "ZhimafenMainActivity";
 
     private static final int MY_REQ_CONFIG_CODE = 0x100;
     private static final int MY_REQ_RESET_CODE = 0x111;
 
     private Context mContext = null;
     private EditText mUserNameView = null;
-    private EditText mPasswordView = null;
     private EditText mUserIdView = null;
     private EditText mPhoneNoView = null;
     private EditText mCallbackURLView = null;
@@ -38,12 +37,12 @@ public class CarrierMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_carrier);
+        setContentView(R.layout.activity_zhimafen);
 
         mContext = this;
 
         buildWidgets();
-        populateCarrierInfoIfNeeded();
+        populateZhimafenInfoIfNeeded();
     }
 
     @Override
@@ -57,7 +56,7 @@ public class CarrierMainActivity extends AppCompatActivity {
 
         AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
         if (null == authInfo || null == authInfo.getAppId()) {
-            Intent intent = new Intent(CarrierMainActivity.this, AuthInfoActivity.class);
+            Intent intent = new Intent(ZhimafenMainActivity.this, AuthInfoActivity.class);
             startActivityForResult(intent, MY_REQ_CONFIG_CODE);
         }
     }
@@ -68,13 +67,11 @@ public class CarrierMainActivity extends AppCompatActivity {
 
         mUserNameView = (EditText) findViewById(R.id.user_name);
         mPhoneNoView = (EditText) findViewById(R.id.phone_no);
-        mPasswordView = (EditText) findViewById(R.id.password);
         mUserIdView = (EditText) findViewById(R.id.user_id);
         mCallbackURLView = (EditText) findViewById(R.id.callback_url);
 
         mUserNameView.setOnEditorActionListener(onEditorActionListener);
         mPhoneNoView.setOnEditorActionListener(onEditorActionListener);
-        mPasswordView.setOnEditorActionListener(onEditorActionListener);
         mUserIdView.setOnEditorActionListener(onEditorActionListener);
         mCallbackURLView.setOnEditorActionListener(onEditorActionListener);
 
@@ -108,7 +105,7 @@ public class CarrierMainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset_auth) {
-            Intent intent = new Intent(CarrierMainActivity.this, AuthInfoActivity.class);
+            Intent intent = new Intent(ZhimafenMainActivity.this, AuthInfoActivity.class);
             startActivityForResult(intent, MY_REQ_RESET_CODE);
             return true;
         }
@@ -128,11 +125,10 @@ public class CarrierMainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void populateCarrierInfoIfNeeded() {
+    private void populateZhimafenInfoIfNeeded() {
         CarrierInfo carrierInfo = Storage.getInstance().getCarrierInfo(mContext);
         if (null != carrierInfo) {
             mUserNameView.setText(carrierInfo.getUserName());
-            mPasswordView.setText(carrierInfo.getPassword());
             mUserIdView.setText(carrierInfo.getUserID());
             mPhoneNoView.setText(carrierInfo.getPhoneNo());
             mCallbackURLView.setText(carrierInfo.getCallback());
@@ -141,8 +137,6 @@ public class CarrierMainActivity extends AppCompatActivity {
 
     private void attemptCreateTask() {
         mUserNameView.setError(null);
-        mPasswordView.setError(null);
-        mPasswordView.setError(null);
         mUserIdView.setError(null);
         mCallbackURLView.setError(null);
 
@@ -150,7 +144,6 @@ public class CarrierMainActivity extends AppCompatActivity {
         View focusView = null;
 
         String userName = mUserNameView.getText().toString();
-        String password = mPasswordView.getText().toString();
         String phoneNo = mPhoneNoView.getText().toString();
         String userID = mUserIdView.getText().toString();
         String callback = mCallbackURLView.getText().toString();
@@ -159,11 +152,6 @@ public class CarrierMainActivity extends AppCompatActivity {
             mUserNameView.setError(getString(R.string.error_invalid_username));
             cancel = true;
             focusView = mUserNameView;
-        }
-        else if (TextUtils.isEmpty(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            cancel = true;
-            focusView = mPasswordView;
         }
         else if (TextUtils.isEmpty(phoneNo) || !FormatValidator.isMobile(phoneNo)) {
             mPhoneNoView.setError(getString(R.string.error_invalid_phoneno));
@@ -184,18 +172,12 @@ public class CarrierMainActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            CarrierInfo carrierInfo = new CarrierInfo(
-                    userName,
-                    phoneNo,
-                    password,
-                    userID,
-                    callback
-            );
+            CarrierInfo carrierInfo = new CarrierInfo(null, null, null, null, null);
 
             Log.i(TAG, "start to save carrier info - " + carrierInfo);
             Storage.getInstance().saveCarrierInfo(mContext, carrierInfo);
 
-            Intent intent = new Intent(CarrierMainActivity.this, CarrierTaskActivity.class);
+            Intent intent = new Intent(ZhimafenMainActivity.this, CarrierTaskActivity.class);
             mContext.startActivity(intent);
 
         }

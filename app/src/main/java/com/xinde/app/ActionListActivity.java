@@ -52,7 +52,7 @@ public class ActionListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i(TAG, "start to demonstrate xinde data zhimafen with direct API mode.");
 
-                mContext.startActivity(new Intent(ActionListActivity.this, CarrierMainActivity.class));
+                mContext.startActivity(new Intent(ActionListActivity.this, ZhimafenMainActivity.class));
 
             }
         });

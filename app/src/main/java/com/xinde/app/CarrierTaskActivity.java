@@ -85,7 +85,7 @@ public class CarrierTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task);
+        setContentView(R.layout.activity_task_carrier);
 
         mContext = this;
         mProcessView = findViewById(R.id.progress_view);
