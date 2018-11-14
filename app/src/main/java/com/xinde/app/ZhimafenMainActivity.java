@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.xinde.storage.Storage;
 import com.xinde.storage.item.AuthInfo;
-import com.xinde.storage.item.CarrierInfo;
 import com.xinde.storage.item.ZhimafenInfo;
 import com.xinde.util.FormatValidator;
 
@@ -127,12 +126,12 @@ public class ZhimafenMainActivity extends AppCompatActivity {
     }
 
     private void populateZhimafenInfoIfNeeded() {
-        CarrierInfo carrierInfo = Storage.getInstance().getCarrierInfo(mContext);
-        if (null != carrierInfo) {
-            mUserNameView.setText(carrierInfo.getUserName());
-            mUserIdView.setText(carrierInfo.getUserID());
-            mPhoneNoView.setText(carrierInfo.getPhoneNo());
-            mCallbackURLView.setText(carrierInfo.getCallback());
+        ZhimafenInfo zhimafenInfo = Storage.getInstance().getZhimafenInfo(mContext);
+        if (null != zhimafenInfo) {
+            mUserNameView.setText(zhimafenInfo.getUserName());
+            mUserIdView.setText(zhimafenInfo.getUserID());
+            mPhoneNoView.setText(zhimafenInfo.getPhoneNo());
+            mCallbackURLView.setText(zhimafenInfo.getCallback());
         }
     }
 

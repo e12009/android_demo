@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.xinde.reponse.TaskCreationResponse;
@@ -160,7 +161,6 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
             return;
         }
 
-        //TODO: launch alipay app if present or tell user to install this app
         String url = mCurrentTaskStatusResp.getQR().getUrl();
         handleAlipayProtocol(mContext, url);
 
@@ -200,6 +200,7 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         showOngoingMessage(getString(R.string.launch_alipay_app));
+                        Toast.makeText(mContext, getString(R.string.launch_alipay_app), Toast.LENGTH_LONG).show();
                     }
                 });
 
