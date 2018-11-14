@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.xinde.storage.Storage;
 import com.xinde.storage.item.AuthInfo;
 import com.xinde.storage.item.CarrierInfo;
+import com.xinde.storage.item.ZhimafenInfo;
 import com.xinde.util.FormatValidator;
 
 public class ZhimafenMainActivity extends AppCompatActivity {
@@ -172,12 +173,12 @@ public class ZhimafenMainActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            CarrierInfo carrierInfo = new CarrierInfo(null, null, null, null, null);
+            ZhimafenInfo zhimafenInfo = new ZhimafenInfo(userName, phoneNo, userID, callback);
 
-            Log.i(TAG, "start to save carrier info - " + carrierInfo);
-            Storage.getInstance().saveCarrierInfo(mContext, carrierInfo);
+            Log.i(TAG, "start to save zhimafen info - " + zhimafenInfo);
+            Storage.getInstance().saveZhimafenInfo(mContext, zhimafenInfo);
 
-            Intent intent = new Intent(ZhimafenMainActivity.this, CarrierTaskActivity.class);
+            Intent intent = new Intent(ZhimafenMainActivity.this, ZhimafenTaskActivity.class);
             mContext.startActivity(intent);
 
         }

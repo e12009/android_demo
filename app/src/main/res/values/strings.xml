@@ -34,4 +34,5 @@
     <string name="xinde_zhimafen_api_demo">芝麻分API直连业务演示</string>
     <string name="title_activity_zhimafen_activity">ZhimafenActivityActivity</string>
     <string name="xinde_zhimafen_demo">芝麻分直连业务演示</string>
+    <string name="title_activity_zhimafen_task">ZhimafenTaskActivity</string>
 </resources>

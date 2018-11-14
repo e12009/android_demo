@@ -3,15 +3,15 @@ package com.xinde.reponse;
 import java.util.Date;
 
 public class TaskStatusResponse<T> {
-    private String tid = null;
-    private String status = null;
-    private String phase = null;
-    private Date lastUpdateTime = null;
-    private String need = null;
-    private int failCode = 0;
-    private String reason = null;
+    protected String tid = null;
+    protected String status = null;
+    protected String phase = null;
+    protected Date lastUpdateTime = null;
+    protected String need = null;
+    protected int failCode = 0;
+    protected String reason = null;
 
-    private T result = null;
+    protected T result = null;
 
     public TaskStatusResponse() {
 
