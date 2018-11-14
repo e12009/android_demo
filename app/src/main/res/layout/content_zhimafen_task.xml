@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:text="@string/progress_status_login"/>
+                android:text="@string/progress_status_auth"/>
     </LinearLayout>
 
     <!-- failure view -->
@@ -59,8 +59,20 @@
             android:id="@+id/show_score"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="100dp">
+        <TextView
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:text="@string/title_zhimafen_score"/>
+        <TextView
+                android:id="@+id/show_zhimafen_score"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
     </android.support.v7.widget.CardView>
 
 </RelativeLayout>

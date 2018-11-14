@@ -1,11 +1,14 @@
 package com.xinde.app;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -155,7 +158,9 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
             return;
         }
 
-
+        //TODO: launch alipay app if present or tell user to install this app
+        String url = mCurrentTaskStatusResp.getQR().getUrl();
+        handleAlipayProtocol(mContext, url);
     }
 
     private void showAbortMessage(String msg) {
@@ -172,7 +177,44 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
         hideViews(mFailureView, mProcessView);
         showView(mSuccessView);
 
-        //TODO: show final result in cardview
+        TextView textView = (TextView) mSuccessView.findViewById(R.id.show_zhimafen_score);
+        textView.setText(String.valueOf(mCurrentTaskStatusResp.getResult().getZhimafen()));
+    }
+
+    public void handleAlipayProtocol(final Context context, String url) {
+
+        if(url.startsWith("alipays:") || url.startsWith("alipay:")) {
+            try {
+                context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse(url)));
+                Log.i("TAG", "OK, alipay app should be launched now.");
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showOngoingMessage(getString(R.string.launch_alipay_app));
+                    }
+                });
+
+            } catch (Exception e) {
+                Log.e("TAG", "No alipay app on this device!");
+
+                new AlertDialog.Builder(context)
+                        .setMessage("未检测到支付宝客户端，请安装后重试。")
+                        .setPositiveButton("立即安装", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri alipayUrl = Uri.parse("https://d.alipay.com");
+                                context.startActivity(new Intent("android.intent.action.VIEW", alipayUrl));
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+            }
+
+
+        }
+
     }
 
     private Handler mHandler = new Handler() {

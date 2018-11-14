@@ -28,11 +28,12 @@
     <string name="title_activity_task">TaskActivity</string>
     <string name="action_reset_auth">Reset Auth Info</string>
     <string name="progress_status_login">登录中...</string>
+    <string name="progress_status_auth">授权中...</string>
     <string name="progress_status_fetching">数据获取中...</string>
     <string name="hint_input_sms_code">输入短信验证码</string>
     <string name="title_activity_action_list">ActionListActivity</string>
     <string name="xinde_zhimafen_api_demo">芝麻分API直连业务演示</string>
-    <string name="title_activity_zhimafen_activity">ZhimafenActivityActivity</string>
     <string name="xinde_zhimafen_demo">芝麻分直连业务演示</string>
-    <string name="title_activity_zhimafen_task">ZhimafenTaskActivity</string>
+    <string name="title_zhimafen_score">当前芝麻分</string>
+    <string name="launch_alipay_app">正在唤起支付宝应用.</string>
 </resources>

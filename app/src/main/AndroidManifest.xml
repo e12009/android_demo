@@ -15,11 +15,13 @@
         </activity>
         <activity
                 android:name=".CarrierMainActivity"
+                android:label="@string/app_name"
                 android:launchMode="singleTask"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
                 android:name=".CarrierTaskActivity"
+                android:label="@string/app_name"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
@@ -40,7 +42,7 @@
         </activity>
         <activity
                 android:name=".ZhimafenTaskActivity"
-                android:label="@string/title_activity_zhimafen_task"
+                android:label="@string/app_name"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

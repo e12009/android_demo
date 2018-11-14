@@ -4,6 +4,14 @@ public class ZhimafenTaskStatusResponse<T> extends TaskStatusResponse<T> {
     private QR QR;
 
 
+    public ZhimafenTaskStatusResponse.QR getQR() {
+        return QR;
+    }
+
+    public void setQR(ZhimafenTaskStatusResponse.QR QR) {
+        this.QR = QR;
+    }
+
     @Override
     public String toString() {
         return "ZhimafenTaskStatusResponse{" +
