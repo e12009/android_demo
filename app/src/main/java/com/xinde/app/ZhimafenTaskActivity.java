@@ -62,6 +62,8 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
     private View mFailureView = null;
     private View mSuccessView = null;
 
+    private boolean misDetectingAlipayApp = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,6 +163,10 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
         //TODO: launch alipay app if present or tell user to install this app
         String url = mCurrentTaskStatusResp.getQR().getUrl();
         handleAlipayProtocol(mContext, url);
+
+        if (misDetectingAlipayApp) {
+            mHandler.sendEmptyMessageDelayed(MSG_CHECK_TASK_STATUS, 5000L);
+        }
     }
 
     private void showAbortMessage(String msg) {
@@ -188,6 +194,8 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
                 context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse(url)));
                 Log.i("TAG", "OK, alipay app should be launched now.");
 
+                misDetectingAlipayApp = true;
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -206,6 +214,8 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Uri alipayUrl = Uri.parse("https://d.alipay.com");
                                 context.startActivity(new Intent("android.intent.action.VIEW", alipayUrl));
+
+                                misDetectingAlipayApp = true;
                             }
                         })
                         .setNegativeButton("取消", null)
@@ -248,7 +258,12 @@ public class ZhimafenTaskActivity extends AppCompatActivity {
                         mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_ABORT, errorInfo));
                     }
                     else if (mCurrentTaskStatusResp.isSuspended()) {
-                        mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_SUSPENDED, mCurrentTaskStatusResp));
+                        if (!misDetectingAlipayApp) {
+                            mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_SUSPENDED, mCurrentTaskStatusResp));
+                        } else {
+                            Log.i(TAG, "keep on checking task status after trying to launch or install alipay app");
+                            mHandler.sendEmptyMessageDelayed(MSG_CHECK_TASK_STATUS, 5000L);
+                        }
                     }
                     else if (mCurrentTaskStatusResp.isDone()) {
                         mHandler.sendMessage(mHandler.obtainMessage(MSG_TASK_DONE, mCurrentTaskStatusResp));
