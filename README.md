@@ -1,36 +1,21 @@
-# xinde_android_app
+# 信德数聚
 
-#### Description
-xinde data android app
-
-#### Software Architecture
-Software architecture description
-
-#### Installation
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### Instructions
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### Contribution
-
-1. Fork the project
-2. Create Feat_xxx branch
-3. Commit your code
-4. Create Pull Request
+#### 项目描述
+本工程使用**信德数聚**API，通过一个**Android** app，对**运营商业务**和**芝麻分直连业务**进行相关业务逻辑的展示。
 
 
-#### Gitee Feature
 
-1. You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2. Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3. Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4. The most valuable open source project [GVP](https://gitee.com/gvp)
-5. The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6. The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+#### 第三方依赖
+
+```gr
+dependencies {
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+}
+```
+
+
+
+#### API Doc
+
+请联系我们的商务来获取最新的API文档
