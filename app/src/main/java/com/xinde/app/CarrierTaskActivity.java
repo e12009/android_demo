@@ -326,7 +326,7 @@ public class CarrierTaskActivity extends AppCompatActivity {
         String primaryInput = input1.getText().toString();
         String secondaryInput = input2.getText().toString();
 
-        if (TextUtils.isEmpty(primaryInput)) {
+        if (TextUtils.isEmpty(primaryInput) || TextUtils.isEmpty(primaryInput.trim())) {
             cancel = true;
             focusView = input1;
             input1.setError(getString(R.string.error_no_input));
