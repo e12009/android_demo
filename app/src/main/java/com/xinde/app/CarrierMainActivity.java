@@ -155,12 +155,12 @@ public class CarrierMainActivity extends AppCompatActivity {
         String userID = mUserIdView.getText().toString();
         String callback = mCallbackURLView.getText().toString();
 
-        if (TextUtils.isEmpty(userName)) {
+        if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(userName.trim())) {
             mUserNameView.setError(getString(R.string.error_invalid_username));
             cancel = true;
             focusView = mUserNameView;
         }
-        else if (TextUtils.isEmpty(password)) {
+        else if (TextUtils.isEmpty(password) || TextUtils.isEmpty(password.trim())) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             cancel = true;
             focusView = mPasswordView;

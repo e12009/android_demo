@@ -71,12 +71,12 @@ public class AuthInfoActivity extends AppCompatActivity {
        String appId = mAppIdView.getText().toString();
        String appSecret = mAppSecretView.getText().toString();
 
-       if (TextUtils.isEmpty(appId)) {
+       if (TextUtils.isEmpty(appId) || TextUtils.isEmpty(appId.trim())) {
            mAppIdView.setError(getString(R.string.error_invalid_appid));
            cancel = true;
            focusView = mAppIdView;
        }
-       else if (TextUtils.isEmpty(appSecret)) {
+       else if (TextUtils.isEmpty(appSecret) || TextUtils.isEmpty(appSecret.trim())) {
            mAppSecretView.setError(getString(R.string.error_invalid_appsecret));
            cancel = true;
            focusView = mAppSecretView;

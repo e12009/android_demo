@@ -62,8 +62,8 @@ public class Storage {
 
         SharedPreferences pref = context.getSharedPreferences(AUHT_PREF, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(AUTH_ITEM_APPID, authInfo.getAppId());
-        editor.putString(AUTH_ITEM_APPSECRET, authInfo.getAppSecret());
+        editor.putString(AUTH_ITEM_APPID, authInfo.getAppId().trim());
+        editor.putString(AUTH_ITEM_APPSECRET, authInfo.getAppSecret().trim());
         editor.commit();
     }
 
@@ -97,11 +97,11 @@ public class Storage {
 
         SharedPreferences pref = context.getSharedPreferences(CARRIER_PREF, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(ITEM_USER_NAME, carrierInfo.getUserName());
-        editor.putString(ITEM_PHONENO, carrierInfo.getPhoneNo());
-        editor.putString(ITEM_PASSWORD, carrierInfo.getPassword());
-        editor.putString(ITEM_USERID, carrierInfo.getUserID());
-        editor.putString(ITEM_CALLBACK, carrierInfo.getCallback());
+        editor.putString(ITEM_USER_NAME, carrierInfo.getUserName().trim());
+        editor.putString(ITEM_PHONENO, carrierInfo.getPhoneNo().trim());
+        editor.putString(ITEM_PASSWORD, carrierInfo.getPassword().trim());
+        editor.putString(ITEM_USERID, carrierInfo.getUserID().trim());
+        editor.putString(ITEM_CALLBACK, carrierInfo.getCallback().trim());
         editor.commit();
     }
 
@@ -134,10 +134,10 @@ public class Storage {
 
         SharedPreferences pref = context.getSharedPreferences(ZHIMAFEN_PREF, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(ITEM_USER_NAME, zhimafenInfo.getUserName());
-        editor.putString(ITEM_PHONENO, zhimafenInfo.getPhoneNo());
-        editor.putString(ITEM_USERID, zhimafenInfo.getUserID());
-        editor.putString(ITEM_CALLBACK, zhimafenInfo.getCallback());
+        editor.putString(ITEM_USER_NAME, zhimafenInfo.getUserName().trim());
+        editor.putString(ITEM_PHONENO, zhimafenInfo.getPhoneNo().trim());
+        editor.putString(ITEM_USERID, zhimafenInfo.getUserID().trim());
+        editor.putString(ITEM_CALLBACK, zhimafenInfo.getCallback().trim());
         editor.commit();
     }
 }

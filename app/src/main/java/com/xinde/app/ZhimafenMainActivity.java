@@ -148,7 +148,7 @@ public class ZhimafenMainActivity extends AppCompatActivity {
         String userID = mUserIdView.getText().toString();
         String callback = mCallbackURLView.getText().toString();
 
-        if (TextUtils.isEmpty(userName)) {
+        if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(userName.trim())) {
             mUserNameView.setError(getString(R.string.error_invalid_username));
             cancel = true;
             focusView = mUserNameView;
