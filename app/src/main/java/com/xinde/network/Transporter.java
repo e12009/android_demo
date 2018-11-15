@@ -18,17 +18,26 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 网络请求类
+ *
+ * 用户处理安全认证，任务创建，任务状态查询，继续挂起的任务
+ */
 public class Transporter {
     private static final String TAG = "Transporter";
 
     private static final String XINDE_API_URL = "https://api.xindedata.com/v1/task";
+    // 信德数聚的证书文件
     private static final String XINDE_CER = "xinde_ca.cer";
 
     private OkHttpClient client;
     private Context mContext;
 
+    // 创建任务时使用的callback
     private Callback mCreateTaskCallback;
+    // 查询任务时使用的callback
     private Callback mCheckTaskCallback;
+    // 继续任务时使用的callback
     private Callback mResumeTaskCallback;
 
     public Transporter(Context context) {
@@ -40,6 +49,14 @@ public class Transporter {
         setup(context, createTaskCallback, resumeTaskCallback, checkTaskCallback);
     }
 
+    /**
+     * 初始化
+     *
+     * @param context               Context实例
+     * @param createTaskCallback    为创建任务准备的callback
+     * @param resumeTaskCallback    为继续挂起的任务准备的callback
+     * @param checkTaskCallback     为检查任务状态准备的callback
+     */
     private void setup(Context context, Callback createTaskCallback,
                        Callback resumeTaskCallback, Callback checkTaskCallback) {
 
@@ -137,8 +154,9 @@ public class Transporter {
 
     /**
      * 添加password
+     *
      * @param password
-     * @return
+     * @return KeyStore
      * @throws GeneralSecurityException
      */
     private KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
@@ -152,6 +170,11 @@ public class Transporter {
         }
     }
 
+    /**
+     * 创建任务
+     *
+     * @param body  需要post的request body
+     */
     public void createTask(RequestBody body) {
         AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
 
@@ -159,6 +182,7 @@ public class Transporter {
         Log.i(TAG, "[x] create task");
 
         String timestamp = String.valueOf(System.currentTimeMillis()/1000);
+        // 获取签名
         String signature = new XindeSignatureBuilder(authInfo.getAppSecret())
                 .addParamStringPair("appid", authInfo.getAppId())
                 .addParamStringPair("time", timestamp)
@@ -179,22 +203,35 @@ public class Transporter {
 
     }
 
+    /**
+     * callback assignment
+     *
+     * @param callback  callback for task creation
+     */
     public void setCreateTaskCallback(Callback callback) {
         mCreateTaskCallback = callback;
     }
 
+    /**
+     * 查询任务状态
+     *
+     * @param tid   需要查询的任务的tid
+     */
     public void checkTaskStatus(String tid) {
         AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
 
         Log.i(TAG, "[x] check task status");
 
+        // 获取当前时间
         String timestamp = String.valueOf(System.currentTimeMillis()/1000);
+        // 获取signature
         String signature = new XindeSignatureBuilder(authInfo.getAppSecret())
                 .addParamStringPair("tid", tid)
                 .addParamStringPair("appid", authInfo.getAppId())
                 .addParamStringPair("time", timestamp)
                 .build();
 
+        // 创建 URL
         HttpUrl.Builder httpBuilder = HttpUrl.parse(XINDE_API_URL).newBuilder()
                 .addQueryParameter("tid", tid)
                 .addQueryParameter("appid", authInfo.getAppId())
@@ -210,10 +247,21 @@ public class Transporter {
         client.newCall(request).enqueue(callback);
     }
 
+    /**
+     * 设置查询任务时用的callback
+     *
+     * @param callback callback
+     */
     public void setCheckTaskCallback(Callback callback) {
         mCheckTaskCallback = callback;
     }
 
+    /**
+     * 继续挂起的任务
+     *
+     * @param body 需要post的body，用来提供进一步的信息以便任务的继续
+     *
+     */
     public void resumeTask(RequestBody body) {
         AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
 
@@ -244,10 +292,18 @@ public class Transporter {
 
     }
 
+    /**
+     * setup callback used by task resuming routine
+     *
+     * @param callback callback
+     */
     public void setResumeTaskCallback(Callback callback) {
         mResumeTaskCallback = callback;
     }
 
+    /**
+     * callback by default
+     */
     private final Callback defaultCallback = new Callback() {
         @Override
         public void onFailure(Call call, IOException e) {

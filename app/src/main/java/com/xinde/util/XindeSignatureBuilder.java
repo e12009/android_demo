@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
+/**
+ * 信德数聚 签名工具类
+ */
 public class XindeSignatureBuilder {
     private String appSecret = null;
     private TreeMap<String, String> paramsMap = null;

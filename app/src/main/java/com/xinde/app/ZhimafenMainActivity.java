@@ -22,6 +22,9 @@ import com.xinde.storage.item.AuthInfo;
 import com.xinde.storage.item.ZhimafenInfo;
 import com.xinde.util.FormatValidator;
 
+/**
+ * 编辑芝麻分认证所需的各个数据项，并在数据通过有效性检查后进行保存
+ */
 public class ZhimafenMainActivity extends AppCompatActivity {
     private static final String TAG = "ZhimafenMainActivity";
 
@@ -61,6 +64,9 @@ public class ZhimafenMainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 初始化相关的Widgets
+     */
     private void buildWidgets() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -125,6 +131,9 @@ public class ZhimafenMainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * 显示保存的认证信息
+     */
     private void populateZhimafenInfoIfNeeded() {
         ZhimafenInfo zhimafenInfo = Storage.getInstance().getZhimafenInfo(mContext);
         if (null != zhimafenInfo) {
@@ -135,6 +144,9 @@ public class ZhimafenMainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 对数据有效性进行检查，如果各个数据项符合规则，则保存相关的认证信息并
+     */
     private void attemptCreateTask() {
         mUserNameView.setError(null);
         mUserIdView.setError(null);
@@ -183,7 +195,9 @@ public class ZhimafenMainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * 键盘处理
+     */
     private TextView.OnEditorActionListener onEditorActionListener = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

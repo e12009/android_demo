@@ -2,6 +2,11 @@ package com.xinde.reponse;
 
 import java.util.Date;
 
+/**
+ * POJO object definition for task creation response
+ *
+ * check out xinde data API doc for details
+ */
 public class TaskCreationResponse {
     private String tid = null;
     private String status = null;

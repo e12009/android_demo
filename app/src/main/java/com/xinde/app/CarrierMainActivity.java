@@ -22,6 +22,9 @@ import com.xinde.storage.item.AuthInfo;
 import com.xinde.storage.item.CarrierInfo;
 import com.xinde.util.FormatValidator;
 
+/**
+ * 编辑并保存运营商业务参数
+ */
 public class CarrierMainActivity extends AppCompatActivity {
     private static final String TAG = "CarrierMainActivity";
 
@@ -55,6 +58,7 @@ public class CarrierMainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // 如果此时appId & appSecret为空，则拉起AuthInfoActivity进行信息的输入
         AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
         if (null == authInfo || null == authInfo.getAppId()) {
             Intent intent = new Intent(CarrierMainActivity.this, AuthInfoActivity.class);
@@ -62,6 +66,9 @@ public class CarrierMainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 设置toolbar并设置其他Widgets
+     */
     private void buildWidgets() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -128,6 +135,9 @@ public class CarrierMainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     *  显示保存过的运营商认证参数信息
+     */
     private void populateCarrierInfoIfNeeded() {
         CarrierInfo carrierInfo = Storage.getInstance().getCarrierInfo(mContext);
         if (null != carrierInfo) {
@@ -139,6 +149,10 @@ public class CarrierMainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 检查输入参数的有效性，如果通过参数检查，则保存当前的认证参数，
+     * 同时，拉起CarrierTaskActivity来执行业务查询任务
+     */
     private void attemptCreateTask() {
         mUserNameView.setError(null);
         mPasswordView.setError(null);
@@ -184,6 +198,7 @@ public class CarrierMainActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
+            // 保存现有数据
             CarrierInfo carrierInfo = new CarrierInfo(
                     userName,
                     phoneNo,
@@ -195,6 +210,7 @@ public class CarrierMainActivity extends AppCompatActivity {
             Log.i(TAG, "start to save carrier info - " + carrierInfo);
             Storage.getInstance().saveCarrierInfo(mContext, carrierInfo);
 
+            // 拉起CarrierTaskActivity执行业务查询任务
             Intent intent = new Intent(CarrierMainActivity.this, CarrierTaskActivity.class);
             mContext.startActivity(intent);
 
@@ -202,6 +218,7 @@ public class CarrierMainActivity extends AppCompatActivity {
     }
 
 
+    // 处理键盘事件
     private TextView.OnEditorActionListener onEditorActionListener = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

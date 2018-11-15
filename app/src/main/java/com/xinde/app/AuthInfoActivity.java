@@ -15,6 +15,9 @@ import android.widget.TextView;
 import com.xinde.storage.Storage;
 import com.xinde.storage.item.AuthInfo;
 
+/**
+ * 编辑appId & appSecret的Activity
+ */
 public class AuthInfoActivity extends AppCompatActivity {
     private static final String TAG = "AuthInfoActivity";
 
@@ -43,16 +46,21 @@ public class AuthInfoActivity extends AppCompatActivity {
             }
         });
 
+        // 显示以前保存的appId & appSecret
         populateAuthInfoIfNeeded();
     }
 
     @Override
     public void onBackPressed() {
+        // 因为本Activity是通过其他Activity拉起的，在此界面按下Back Key时，需要通知调用方它的退出状态
         setResult(Activity.RESULT_CANCELED);
 
         super.onBackPressed();
     }
 
+    /**
+     * 用于显示保存的appId & appSecret数据
+     */
     private void populateAuthInfoIfNeeded() {
         AuthInfo authInfo = Storage.getInstance().getAuthInfo(mContext);
         if (null != authInfo) {
@@ -61,6 +69,11 @@ public class AuthInfoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 尝试保存当前appId & appSecret内容并退出当前Activity
+     *
+     * 如果有输入项的内容无效，则提示对应的错误信息并引导用户进行相应的更正
+     */
     private void attemptSaveAuthInfo() {
        mAppIdView.setError(null);
        mAppSecretView.setError(null);
@@ -94,6 +107,9 @@ public class AuthInfoActivity extends AppCompatActivity {
        }
     }
 
+    /**
+     * 处理键盘事件，并在IME_ACTION_DONE或者IME_NULL时进行保存数据
+     */
     private TextView.OnEditorActionListener onEditorActionListener = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

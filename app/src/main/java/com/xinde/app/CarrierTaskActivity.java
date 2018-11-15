@@ -42,11 +42,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * 执行运营商业务并显示相应的结果
+ */
 public class CarrierTaskActivity extends AppCompatActivity {
     private static final String TAG = "CarrierTaskActivity";
 
     private static final int MY_REQ_CODE = 0x200;
 
+    /*
+     * 消息类别
+     */
     private static final int MSG_CREATE_TASK = 0x01;
     private static final int MSG_CHECK_TASK_STATUS = 0x02;
     private static final int MSG_CHECK_TASK_STATUS_FEEDBACK = 0x22;
@@ -54,6 +60,9 @@ public class CarrierTaskActivity extends AppCompatActivity {
     private static final int MSG_TASK_ABORT = 0x44;
     private static final int MSG_TASK_DONE = 0x05;
 
+    /*
+     * Suspended Task Type
+     */
     private static final int SUSPENDED_TYPE_NULL = 0x00;
     private static final int SUSPENDED_TYPE_NEED_PASSWORD = 0x01;
     private static final int SUSPENDED_TYPE_NEED_SMSCODE = 0x02;
@@ -62,14 +71,16 @@ public class CarrierTaskActivity extends AppCompatActivity {
     private Context mContext = null;
     private Transport mTransport = null;
 
+    // widgets
     private View mProcessView = null;
     private View mSuspendedView = null;
     private View mFailureView = null;
     private RecyclerView mSuccessView = null;
     private CarrierAdapter mCarrierAdapter = null;
 
-
+    // 查询Task状态时返回的数据类型
     private TaskStatusResponse<CarrierResult> mCurrentTaskStatusResp = null;
+
     private int mSuspendedType = SUSPENDED_TYPE_NULL;
 
     @Override
@@ -126,6 +137,12 @@ public class CarrierTaskActivity extends AppCompatActivity {
         // just ignore result from AuthInfoActivity
     }
 
+    /**
+     * 隐藏软键盘
+     *
+     * @param activeView 当前有焦点的View
+     * @return 如果键盘被成功隐藏则返回true, 否则返回false
+     */
     private boolean hideSoftKeyboard(View activeView) {
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (null != imm && null != activeView) {
@@ -136,6 +153,11 @@ public class CarrierTaskActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * 隐藏对应的Views
+     *
+     * @param views 需要被隐藏的View列表
+     */
     private void hideViews(View... views) {
         for (View view : views) {
             if (null == view) continue;
@@ -146,6 +168,11 @@ public class CarrierTaskActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 显示View
+     *
+     * @param view 需要被显示的View
+     */
     private void showView(View view) {
         if (null != view) {
             if (View.VISIBLE != view.getVisibility()) {
@@ -154,6 +181,11 @@ public class CarrierTaskActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 显示‘任务进行中’的UI
+     *
+     * @param msg 显示的提示信息
+     */
     private void showOngoingMessage(String msg) {
         hideViews(mFailureView, mSuspendedView, mSuccessView);
 
@@ -165,6 +197,11 @@ public class CarrierTaskActivity extends AppCompatActivity {
         showView(progressBar);
     }
 
+    /**
+     * 显示任务错误信息
+     *
+     * @param msg 需要显示的内容
+     */
     private void showAbortMessage(String msg) {
         ProgressBar progressBar = (ProgressBar) mProcessView.findViewById(R.id.progressbar);
         hideViews(mFailureView, mSuspendedView, mSuccessView, progressBar);
@@ -175,6 +212,9 @@ public class CarrierTaskActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 显示查询的结果
+     */
     private void showTaskResult() {
         hideViews(mFailureView, mSuspendedView, mProcessView);
         showView(mSuccessView);
@@ -318,6 +358,15 @@ public class CarrierTaskActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 任务暂停，需要用户提交进一步的信息，比如短信验证码，正确的密码，等等
+     * 此方法中对输入内容的有效性进行检查，如果数据有效，则继续当前暂停的任务
+     *
+     * @param input1    输入数据域1
+     * @param input2    输入数据域2
+     *
+     * @return 如果数据没有通过有效性检查，则返回true，否则返回false
+     */
     private boolean attemptResumeTask(EditText input1, EditText input2) {
 
         boolean cancel = false;
@@ -349,12 +398,18 @@ public class CarrierTaskActivity extends AppCompatActivity {
                 hideSoftKeyboard(input2);
             }
 
+            // 继续当前挂起的任务
             mTransport.resumeTask(mSuspendedType, primaryInput, secondaryInput);
         }
 
         return !cancel;
     }
 
+    /**
+     * 显示任务挂起的详细信息，并提供输入域供用户输入进一步的信息，以便继续当前的任务
+     *
+     * @param response 任务挂起的详细原因
+     */
     private void showSuspendedUI(TaskStatusResponse<CarrierResult> response) {
         if (null == response) {
             Log.e(TAG, "response is not passed in, we cannot process the suspended case.");
@@ -400,6 +455,7 @@ public class CarrierTaskActivity extends AppCompatActivity {
         hideViews(input2);
         textView.setText(response.getReason());
 
+        // 对于各个数据项的介绍，请参照对应的API文档
         switch (response.getNeed()) {
             case "SMS":
             case "SMSJilinTelecom":
@@ -440,6 +496,7 @@ public class CarrierTaskActivity extends AppCompatActivity {
         showView(mSuspendedView);
     }
 
+    // 为了便于更新UI，此处创建一个Message Handler,并使用当前的UI线程的Looper
     private Handler mHandler = new Handler() {
         /**
          * Subclasses must implement this to receive messages.
@@ -517,7 +574,9 @@ public class CarrierTaskActivity extends AppCompatActivity {
     };
 
 
-
+    /**
+     * 执行具体的网络请求的类
+     */
     private class Transport {
 
         private Transporter transporter = null;

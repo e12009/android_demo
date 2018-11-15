@@ -1,5 +1,10 @@
 package com.xinde.reponse;
 
+/**
+ * POJO object definition of response data regarding zhimafen task status
+ *
+ * check out xinde data API doc for details
+ */
 public class ZhimafenTaskStatusResponse<T> extends TaskStatusResponse<T> {
     private QR QR;
 

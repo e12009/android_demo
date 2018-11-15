@@ -9,6 +9,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+/**
+ * 程序主页面，提供两个业务测试项
+ */
 public class ActionListActivity extends AppCompatActivity {
     private static final String TAG = "ActionListActivity";
 

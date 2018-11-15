@@ -2,6 +2,11 @@ package com.xinde.reponse;
 
 import java.util.Date;
 
+/**
+ * POJO object definition for task status response
+ *
+ * check out xinde data API doc for details
+ */
 public class TaskStatusResponse<T> {
     protected String tid = null;
     protected String status = null;
