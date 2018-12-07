@@ -59,6 +59,21 @@ public class ActionListActivity extends AppCompatActivity {
 
             }
         });
+
+        button = (Button) findViewById(R.id.demo_taobao_appauth);
+        button.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Called when a view has been clicked.
+             *
+             * @param v The view that was clicked.
+             */
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "start to demonstrate xinde data taobao appauth");
+
+                mContext.startActivity(new Intent(ActionListActivity.this, TaobaoAppAuthActivity.class));
+            }
+        });
     }
 
 }
